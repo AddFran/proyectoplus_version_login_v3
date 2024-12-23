@@ -8,6 +8,8 @@ import requests
 firebase_credentials = st.secrets["firebase_credentials"]
 api_key = firebase_credentials["api_key"]
 
+firebase_credentials_dict = dict(firebase_credentials)
+
 # Inicializar Firebase Admin usando las credenciales desde secrets
 if not firebase_admin._apps:
     cred = credentials.Certificate(firebase_credentials)
