@@ -12,7 +12,7 @@ firebase_credentials_dict = dict(firebase_credentials)
 
 # Inicializar Firebase Admin usando las credenciales desde secrets
 if not firebase_admin._apps:
-    cred = credentials.Certificate(firebase_credentials)
+    cred = credentials.Certificate(firebase_credentials_dict)
     firebase_admin.initialize_app(cred)
 
 def es_correo_valido(correo):
