@@ -1,22 +1,16 @@
-#pagina del login
-
 import streamlit as st
-#Funcionamiento del login
 import firebase_admin
 from firebase_admin import credentials, auth
 import re
 import requests
-import json
 
-# Leer el archivo config.json
-with open("firebase-adminsdk.json", "r") as file:
-    config = json.load(file)
+# Leer credenciales desde Streamlit secrets
+firebase_credentials = st.secrets["firebase_credentials"]
+api_key = firebase_credentials["api_key"]
 
-# Extraer la API key
-key = config.get("api_key")
-
-cred = credentials.Certificate("firebase-adminsdk.json")
+# Inicializar Firebase Admin usando las credenciales desde secrets
 if not firebase_admin._apps:
+    cred = credentials.Certificate(firebase_credentials)
     firebase_admin.initialize_app(cred)
 
 def es_correo_valido(correo):
@@ -30,9 +24,8 @@ def verificar_usuario(usuario, password):
     try:
         user = auth.get_user_by_email(usuario)
 
-        import requests
+        # Autenticación con la API de Firebase usando API Key
         url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
-        api_key = key 
         payload = {
             "email": usuario,
             "password": password,
@@ -80,24 +73,24 @@ def login_page():
 
 def crear_usuario_page():
     st.title("Crear cuenta")
-    nombre=st.text_input("Nombre completo")
-    usuario=st.text_input("Correo electrónico")
-    password=st.text_input("Contraseña",type="password")
+    nombre = st.text_input("Nombre completo")
+    usuario = st.text_input("Correo electrónico")
+    password = st.text_input("Contraseña", type="password")
 
     if st.button("Registrarse"):
         try:
-            #Crear usuario en Firebase con correo y contraseña
-            user=auth.create_user(
+            # Crear usuario en Firebase con correo y contraseña
+            user = auth.create_user(
                 email=usuario,
                 password=password,
                 display_name=nombre
             )
             st.success("Usuario registrado exitosamente")
-            st.session_state.pagina_actual="login"  #Redirigir al login
+            st.session_state.pagina_actual = "login"  # Redirigir al login
             st.rerun()
         except Exception as e:
             st.error(f"Error al crear usuario: {e}")
 
     if st.button("Volver"):
-        st.session_state.pagina_actual="login"
+        st.session_state.pagina_actual = "login"
         st.rerun()
